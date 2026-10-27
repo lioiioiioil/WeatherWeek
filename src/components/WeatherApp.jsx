@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Settings from './Settings'
 import ForecastCard from './ForecastCard'
 import AdvancedTemperatureChart from './AdvancedTemperatureChart'
+import { validateCoordinates } from '../coordinates.mjs'
 
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast'
@@ -78,6 +79,7 @@ export default function WeatherApp(){
   const [currentLocation, setCurrentLocation] = useState(null)
 
   const t = LABELS[settings.lang] || LABELS.en
+  const coordinateError = validateCoordinates(lat, lon).error
 
   // Автоматическое обновление при смене settings
   useEffect(() => {
@@ -150,18 +152,10 @@ export default function WeatherApp(){
     setForecast(null)
     setCurrentLocation(null)
     try{
-      latitude = parseFloat(latitude)
-      longitude = parseFloat(longitude)
-      
-      if(!latitude || !longitude || isNaN(latitude) || isNaN(longitude)){
-        throw new Error(t.invalidCoords)
-      }
-      if(latitude < -90 || latitude > 90){
-        throw new Error(t.latRange)
-      }
-      if(longitude < -180 || longitude > 180){
-        throw new Error(t.lonRange)
-      }
+      const coordinates = validateCoordinates(latitude, longitude)
+      if(coordinates.error) throw new Error(t[coordinates.error])
+      latitude = coordinates.latitude
+      longitude = coordinates.longitude
 
       const params = new URLSearchParams({
         latitude: latitude.toString(),
@@ -329,7 +323,7 @@ export default function WeatherApp(){
           </label>
           <button 
             onClick={()=>fetchWeather(lat, lon, 'coords')} 
-            disabled={loading || !lat || !lon}
+            disabled={loading || coordinateError !== null}
           >
             {t.getWeather}
           </button>

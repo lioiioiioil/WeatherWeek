@@ -1,28 +1,15 @@
-# OS / editors
+# Local editor and OS files
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
-# Local settings and credentials
+
+# Local settings
 .env
 .env.*
 !.env.example
-*.pem
-*.key
-# Generated files
-build/
-cmake-build-*/
-output/
-results/
-runs/
-__pycache__/
-*.py[cod]
-.venv/
-venv/
+
+# Dependencies and Vite output
 node_modules/
 dist/
-*.o
-*.a
-*.so
-*.dylib
-*.exe
+*.log
